@@ -182,7 +182,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			$response = curl_exec($curl);
 			{
 				$result = json_decode($response, true);
-				if ($result["status"] == true)
+				if (isset($result["status"]) && $result["status"] == true)
 				{
 					$customer_unq_token = $customer_unq_token;
 				}
@@ -192,6 +192,11 @@ if (defined('PAYMENT_NOTIFICATION')) {
 		if($src == 'upayments'){
 			$src = 'knet';
 		}
+
+		if(!isset($whitelabled)) {
+			$whitelabled = $_SESSION['whitelabeled'] == 1 ? 1 : 0;
+		}
+
 		$unique_order_id=$order_info['order_id'];
 		$params = json_encode([
 			"returnUrl" =>  $confirm_link,
