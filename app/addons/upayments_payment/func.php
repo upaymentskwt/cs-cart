@@ -105,6 +105,7 @@ function smarty_function_curl_request($params, &$smarty) {
 
     $curl = curl_init();
     $merchant_api_key = Registry::get('addons.upayments_payment.merchant_api_key');
+    $merchant_hmac_signature_key = Registry::get('addons.upayments_payment.merchant_hmac_signature_key');
     $test_mode = Registry::get('addons.upayments_payment.test_mode');
     if($test_mode == 'Y'){
         $url='https://sandboxapi.upayments.com/api/v1/check-merchant-api-key';
@@ -155,7 +156,10 @@ function smarty_function_curl_request($params, &$smarty) {
     CURLOPT_CUSTOMREQUEST => 'GET',
     CURLOPT_HTTPHEADER => array(
         'Accept: application/json',
-        'Authorization: Bearer '.$merchant_api_key
+        'Authorization: Bearer '.$merchant_api_key,
+        'Content-Type: application/json',
+        'X-Signature' => $merchant_hmac_signature_key,
+        'Uplugin-Request' => '1',
     ),
     ));
 

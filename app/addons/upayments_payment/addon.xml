@@ -17,6 +17,12 @@
                         <default_value></default_value>
                     </item>
 
+					<item id="merchant_hmac_signature_key">
+                        <name>HMAC Signature Key</name>
+                        <type>input</type>
+                        <default_value></default_value>
+                    </item>
+
                     <item id="test_mode">
                         <name>Test mode</name>
                         <type>checkbox</type>
