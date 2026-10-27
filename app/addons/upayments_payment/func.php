@@ -158,7 +158,7 @@ function smarty_function_curl_request($params, &$smarty) {
         'Accept: application/json',
         'Authorization: Bearer '.$merchant_api_key,
         'Content-Type: application/json',
-        'X-Signature: ' .$merchant_hmac_signature_key,
+        'X-Signature: ' .!empty($merchant_hmac_signature_key) ? $merchant_hmac_signature_key : $merchant_api_key,
         'Uplugin-Request: 1'
     ),
     ));

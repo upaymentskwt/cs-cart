@@ -178,7 +178,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 
 			$curl = curl_init();
 
-			curl_setopt_array($curl, [CURLOPT_URL => $getAPIUrlForCreateToken , CURLOPT_RETURNTRANSFER => true, CURLOPT_ENCODING => "", CURLOPT_MAXREDIRS => 10, CURLOPT_TIMEOUT => 0, CURLOPT_FOLLOWLOCATION => true, CURLOPT_USERAGENT => getUserAgent(), CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1, CURLOPT_CUSTOMREQUEST => "POST", CURLOPT_POSTFIELDS => $params, CURLOPT_HTTPHEADER => ["Accept: application/json", "Content-Type: application/json", "Authorization: Bearer " . $merchant_api_key, 'X-Signature: ' . $merchant_hmac_signature_key, 'Uplugin-Request: 1', ], ]);
+			curl_setopt_array($curl, [CURLOPT_URL => $getAPIUrlForCreateToken , CURLOPT_RETURNTRANSFER => true, CURLOPT_ENCODING => "", CURLOPT_MAXREDIRS => 10, CURLOPT_TIMEOUT => 0, CURLOPT_FOLLOWLOCATION => true, CURLOPT_USERAGENT => getUserAgent(), CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1, CURLOPT_CUSTOMREQUEST => "POST", CURLOPT_POSTFIELDS => $params, CURLOPT_HTTPHEADER => ["Accept: application/json", "Content-Type: application/json", "Authorization: Bearer " . $merchant_api_key, 'X-Signature: ' . !empty($merchant_hmac_signature_key) ? $merchant_hmac_signature_key : $merchant_api_key, 'Uplugin-Request: 1', ], ]);
 
 			$response = curl_exec($curl);
 			{
@@ -259,7 +259,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			'Accept: application/json',
 			'Content-Type: application/json',
 			'Authorization: Bearer '.$merchant_api_key,
-			'X-Signature: '. $merchant_hmac_signature_key,
+			'X-Signature: '. !empty($merchant_hmac_signature_key) ? $merchant_hmac_signature_key : $merchant_api_key,
 			'Uplugin-Request: 1'
 		),
 		));
