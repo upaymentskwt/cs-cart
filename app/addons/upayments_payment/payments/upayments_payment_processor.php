@@ -198,7 +198,6 @@ if (defined('PAYMENT_NOTIFICATION')) {
 		if(!isset($whitelabled)) {
 			$whitelabled = $_SESSION['whitelabeled'] == 1 ? 1 : 0;
 		}
-		
 		$unique_order_id=$order_info['order_id'];
 		$params = json_encode([
 			"returnUrl" =>  $confirm_link,

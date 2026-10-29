@@ -2,7 +2,7 @@
 
 <addon scheme='3.0' edition_type="ROOT,ULT:VENDOR">
     <id>upayments_payment</id>
-    <version>2.0.0</version>
+    <version>3.0.0</version>
     <name>UPayments</name>
     <description>pay with UPayments Payment</description>
     <priority>100500</priority>

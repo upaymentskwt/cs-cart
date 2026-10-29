@@ -8,9 +8,9 @@ if (!defined('AREA')) {
     die('Access denied');
 }
 
-function fn_upayments_payment_send_request($data = [],$gateway_url) {
+function fn_upayments_payment_send_request($gateway_url, $data = []) {
 	// call rest api
-	error_log(PHP_EOL.date('d.m.Y h:i:s') . " Order # ".$order_info['order_id'].' -- CURL DATA '. $data , 3, "upayments.log");
+	// error_log(PHP_EOL.date('d.m.Y h:i:s') . " Order # ".$order_info['order_id'].' -- CURL DATA '. $data , 3, "upayments.log");
     $result = '';
     do {
         $retry = false;
@@ -213,5 +213,115 @@ function getUserAgent(){
 	}
 	return $userAgent;
 }
+
+    function fn_upayments_get_api() {
+        $payment_methods = null;
+        error_log(PHP_EOL.date('d.m.Y h:i:s') . " payment_methods ".'hello'.' -- CURL DATA '. 'hello 3' , 3, "upayments.log");
+        
+        $knet=false;$credit_card=false;$samsung_pay=false;$google_pay=false;$apple_pay=false;$amex=false;
+        $whitelabeled = false;
+
+        $curl = curl_init();
+        $merchant_api_key = Registry::get('addons.upayments_payment.merchant_api_key');
+        $test_mode = Registry::get('addons.upayments_payment.test_mode');
+        if($test_mode == 'Y'){
+            $url='https://sandboxapi.upayments.com/api/v1/check-merchant-api-key';
+        } else {
+            $url='https://apiv2api.upayments.com/api/v1/check-merchant-api-key';
+        }
+
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_USERAGENT => getUserAgent(),
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS =>'{
+            "apiKey": "'.$merchant_api_key.'"
+        }',
+        CURLOPT_HTTPHEADER => array(
+            'Accept: application/json',
+            'Content-Type: application/json'
+        ),
+        ));
+
+        $response = curl_exec($curl);
+
+        $payment_methods_array = [];
+        
+        curl_close($curl);
+        $data = json_decode($response, true);
+        if(isset($data['status']) && $data['status'] == true && isset($data['data']) && !empty($data['data'])){
+            if($test_mode == 'Y'){
+                $url_payment='https://sandboxapi.upayments.com/api/v1/check-payment-button-status';
+            } else {
+                $url_payment='https://apiv2api.upayments.com/api/v1/check-payment-button-status';
+            }
+            $whitelabeled = $data['data']['isWhiteLabel'];
+            $curl = curl_init();
+
+            error_log(PHP_EOL.date('d.m.Y h:i:s') . " whitelabeled ".$whitelabeled.''.' -- CURL DATA ', 3, "upayments.log");
+
+            curl_setopt_array($curl, array(
+            CURLOPT_URL => $url_payment,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_USERAGENT => getUserAgent(),
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_HTTPHEADER => array(
+                    'Accept: application/json',
+                    'Authorization: Bearer '.$merchant_api_key
+                ),
+            ));
+
+            $response = curl_exec($curl);
+
+            $payment_methods_array['whitelabeled'] = $whitelabeled;
+
+            $_SESSION['whitelabeled'] = $whitelabeled;
+
+            // Registry::set('whitelabeled', $whitelabeled);
+
+            curl_close($curl);
+            $payment_methods = json_decode($response, true);
+            if($payment_methods['status'] == true){
+                $p = $payment_methods['data']['payButtons'];
+                    if($p['knet'] == true){
+                        $knet=true;
+                        $payment_methods_array['knet'] = true;
+                    }if(isset($p['apple_pay_knet']) && $p['apple_pay_knet'] == true){
+                        $knet=true;
+                        $payment_methods_array['apple_pay_knet'] = true;
+                    }if($p['credit_card'] == true){
+                        $credit_card=true;
+                        $payment_methods_array['credit_card'] = true;
+                    }if($p['samsung_pay'] == true){
+                        $samsung_pay=true;
+                        $payment_methods_array['samsung_pay'] = true;
+                    }if($p['apple_pay'] == true){
+                        $apple_pay = true;
+                        $payment_methods_array['apple_pay'] = true;
+                    }if($p['google_pay'] == true){
+                        $google_pay = true;
+                        $payment_methods_array['google_pay'] = true;
+                    }if($p['amex'] == true){
+                        $amex = true;
+                        $payment_methods_array['amex'] = true;
+                    }
+
+            }    
+        } else {
+            return null;
+        }
+        return $payment_methods_array;
+    }
 
 ?>
