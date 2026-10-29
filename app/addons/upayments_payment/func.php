@@ -135,7 +135,7 @@ function smarty_function_curl_request($params, &$smarty) {
     $response = curl_exec($curl);
     curl_close($curl);
     $data = json_decode($response, true);
-    if($data['status'] == true){
+    if(isset($data['status']) && $data['status']){
         if($test_mode == 'Y'){
             $url_payment='https://sandboxapi.upayments.com/api/v1/check-payment-button-status';
         } else {
@@ -158,7 +158,7 @@ function smarty_function_curl_request($params, &$smarty) {
         'Accept: application/json',
         'Authorization: Bearer '.$merchant_api_key,
         'Content-Type: application/json',
-        'X-Signature: ' .!empty($merchant_hmac_signature_key) ? $merchant_hmac_signature_key : $merchant_api_key,
+        'X-Signature: ' . (!empty($merchant_hmac_signature_key) ? $merchant_hmac_signature_key : $merchant_api_key),
         'Uplugin-Request: 1'
     ),
     ));
@@ -167,7 +167,7 @@ function smarty_function_curl_request($params, &$smarty) {
 
     curl_close($curl);
     $payment_methods = json_decode($response, true);
-    if($payment_methods['status'] == true){
+    if(isset($payment_methods['status']) && $payment_methods['status'] == true){
         $p = $payment_methods['data']['payButtons'];
             if($p['knet'] == true){
                 $knet=true;
