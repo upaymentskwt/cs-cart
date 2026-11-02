@@ -90,6 +90,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
          */
 
 		$merchant_api_key = Registry::get('addons.upayments_payment.merchant_api_key');
+		$merchant_hmac_signature_key = Registry::get('addons.upayments_payment.merchant_hmac_signature_key');
         $test_mode = Registry::get('addons.upayments_payment.test_mode');
 		$payment_test_mode = 0;
         if ($test_mode == 'Y') {
@@ -177,12 +178,13 @@ if (defined('PAYMENT_NOTIFICATION')) {
 
 			$curl = curl_init();
 
-			curl_setopt_array($curl, [CURLOPT_URL => $getAPIUrlForCreateToken , CURLOPT_RETURNTRANSFER => true, CURLOPT_ENCODING => "", CURLOPT_MAXREDIRS => 10, CURLOPT_TIMEOUT => 0, CURLOPT_FOLLOWLOCATION => true, CURLOPT_USERAGENT => getUserAgent(), CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1, CURLOPT_CUSTOMREQUEST => "POST", CURLOPT_POSTFIELDS => $params, CURLOPT_HTTPHEADER => ["Accept: application/json", "Content-Type: application/json", "Authorization: Bearer " . $merchant_api_key, ], ]);
+			curl_setopt_array($curl, [CURLOPT_URL => $getAPIUrlForCreateToken , CURLOPT_RETURNTRANSFER => true, CURLOPT_ENCODING => "", CURLOPT_MAXREDIRS => 10, CURLOPT_TIMEOUT => 0, CURLOPT_FOLLOWLOCATION => true, CURLOPT_USERAGENT => getUserAgent(), CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1, CURLOPT_CUSTOMREQUEST => "POST", CURLOPT_POSTFIELDS => $params, CURLOPT_HTTPHEADER => ["Accept: application/json", "Content-Type: application/json", "Authorization: Bearer " . $merchant_api_key, 'X-Signature: ' . (!empty($merchant_hmac_signature_key) ? $merchant_hmac_signature_key : $merchant_api_key), 'Uplugin-Request: 1', ], ]);
 
 			$response = curl_exec($curl);
+			curl_close($curl);
 			{
 				$result = json_decode($response, true);
-				if ($result["status"] == true)
+				if (isset($result["status"]) && $result["status"])
 				{
 					$customer_unq_token = $customer_unq_token;
 				}
@@ -191,6 +193,10 @@ if (defined('PAYMENT_NOTIFICATION')) {
 
 		if($src == 'upayments'){
 			$src = 'knet';
+		}
+
+		if(!isset($whitelabled)) {
+			$whitelabled = $_SESSION['whitelabeled'] == 1 ? 1 : 0;
 		}
 		$unique_order_id=$order_info['order_id'];
 		$params = json_encode([
@@ -257,7 +263,9 @@ if (defined('PAYMENT_NOTIFICATION')) {
 		CURLOPT_HTTPHEADER => array(
 			'Accept: application/json',
 			'Content-Type: application/json',
-			'Authorization: Bearer '.$merchant_api_key
+			'Authorization: Bearer '.$merchant_api_key,
+			'X-Signature: '. (!empty($merchant_hmac_signature_key) ? $merchant_hmac_signature_key : $merchant_api_key),
+			'Uplugin-Request: 1'
 		),
 		));
 
@@ -271,7 +279,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			header('Location:  ' . $redirectUrl);
             exit;
 		} else{
-			throw new Exception( $result['message'] );
+			throw new Exception( !empty($result['message']) ? $result['message'] : __('error') );
 		}
     } catch (Exception $exception) {
         fn_set_notification('E', __('Error'), $exception->getMessage());

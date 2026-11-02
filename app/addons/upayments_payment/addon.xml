@@ -2,7 +2,7 @@
 
 <addon scheme='3.0' edition_type="ROOT,ULT:VENDOR">
     <id>upayments_payment</id>
-    <version>2.0.0</version>
+    <version>3.2.0</version>
     <name>UPayments</name>
     <description>pay with UPayments Payment</description>
     <priority>100500</priority>
@@ -13,6 +13,12 @@
                 <items>
 					<item id="merchant_api_key">
                         <name>API Key</name>
+                        <type>input</type>
+                        <default_value></default_value>
+                    </item>
+
+					<item id="merchant_hmac_signature_key">
+                        <name>HMAC Signature Key</name>
                         <type>input</type>
                         <default_value></default_value>
                     </item>

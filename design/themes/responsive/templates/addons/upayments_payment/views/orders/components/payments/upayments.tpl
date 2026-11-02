@@ -1,39 +1,45 @@
-{curl_request url='https://api.example.com/data'}
-{if $whitelabeled == true}
+
+{if $upay_methods['whitelabeled'] == true}
 <div class="payment-method">
     <label class="payment-method-label">Select a payment method:</label>
     <div class="radio-buttons">
-        {if $knet == true}
-        <label class="radio-container">Knet
+        {if $upay_methods['knet'] == true}
+        <label class="radio-container">KNET
             <input type="radio" name="payment_info[upay_payment_method]" value="knet" required>
             <span class="checkmark"></span>
         </label>
         {/if}
-        {if $credit_card== true}
+	{if $upay_methods['apple_pay_knet']== true}
+        <label class="radio-container">Apple Pay KNET
+            <input type="radio" name="payment_info[upay_payment_method]" value="apple-pay-knet">
+            <span class="checkmark"></span>
+        </label>
+        {/if}
+        {if $upay_methods['credit_card']== true}
         <label class="radio-container">Credit Card
             <input type="radio" name="payment_info[upay_payment_method]" value="cc">
             <span class="checkmark"></span>
         </label>
         {/if}
-        {if $samsung_pay == true}
-        <label class="radio-container">Samsung Pay
-            <input type="radio" name="payment_info[upay_payment_method]" value="samsung-pay">
-            <span class="checkmark"></span>
-        </label>
-        {/if}
-        {if $apple_pay== true}
-        <label class="radio-container">Apple Pay
+        {if $upay_methods['apple_pay']== true}
+        <label class="radio-container">Apple Pay Credit Card
             <input type="radio" name="payment_info[upay_payment_method]" value="apple-pay">
             <span class="checkmark"></span>
         </label>
         {/if}
-        {if $google_pay== true}
+        {if $upay_methods['google_pay']== true}
         <label class="radio-container">Google Pay
             <input type="radio" name="payment_info[upay_payment_method]" value="google-pay">
             <span class="checkmark"></span>
         </label>
         {/if}
-        {if $amex== true}
+        {if $upay_methods['samsung_pay'] == true}
+        <label class="radio-container">Samsung Pay
+            <input type="radio" name="payment_info[upay_payment_method]" value="samsung-pay">
+            <span class="checkmark"></span>
+        </label>
+        {/if}
+        {if $upay_methods['amex']== true}
         <label class="radio-container">Amex
             <input type="radio" name="payment_info[upay_payment_method]" value="amex">
             <span class="checkmark"></span>

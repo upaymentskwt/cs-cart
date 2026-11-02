@@ -41,3 +41,8 @@ In CS-Cart Admin, Root administrator can upload the UPayments plugin/Add-on.
 
 3. Select settings tab enter details, Activate the addon and click on save button
    ![](https://files.readme.io/cd2a4ff-image.png)
+
+
+## Plugin Version
+-- 3.0.0
+   Supports Latest CS Cart version 4.19.
